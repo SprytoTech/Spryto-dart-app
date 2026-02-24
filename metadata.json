@@ -1,0 +1,7 @@
+{
+  "name": "SPRYTO Social original",
+  "description": "A high-fidelity dark mode social feed for sports enthusiasts featuring glassmorphism and neon accents.",
+  "requestFramePermissions": [
+    "geolocation"
+  ]
+}
