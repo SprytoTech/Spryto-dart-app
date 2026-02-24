@@ -15,7 +15,7 @@ class FeedScreen extends StatelessWidget {
       children: [
         // Stories
         SizedBox(
-          height: 100,
+          height: 110,
           child: ListView.separated(
             padding: const EdgeInsets.symmetric(horizontal: 20),
             scrollDirection: Axis.horizontal,
@@ -40,16 +40,182 @@ class FeedScreen extends StatelessWidget {
             ],
           ),
         ),
-        const SizedBox(height: 20),
+        const SizedBox(height: 24),
 
-        // Posts
-        ...posts.map((post) => PostCard(post: post)).toList(),
+        // Suggested Plays
+        _buildSectionHeader('Suggested Plays'),
+        const SizedBox(height: 12),
+        SizedBox(
+          height: 180,
+          child: ListView.separated(
+            padding: const EdgeInsets.symmetric(horizontal: 20),
+            scrollDirection: Axis.horizontal,
+            itemCount: suggestedPlays.length,
+            separatorBuilder: (_, __) => const SizedBox(width: 12),
+            itemBuilder: (context, index) =>
+                _buildSuggestedPlayCard(suggestedPlays[index]),
+          ),
+        ),
+        const SizedBox(height: 32),
+
+        // Posts - First post
+        PostCard(post: posts[0]),
+
+        // Trending Players
+        _buildSectionHeader('Trending Players'),
+        const SizedBox(height: 12),
+        SizedBox(
+          height: 240,
+          child: ListView.separated(
+            padding: const EdgeInsets.symmetric(horizontal: 20),
+            scrollDirection: Axis.horizontal,
+            itemCount: trendingPlayers.length,
+            separatorBuilder: (_, __) => const SizedBox(width: 12),
+            itemBuilder: (context, index) =>
+                _buildTrendingPlayerCard(trendingPlayers[index]),
+          ),
+        ),
+        const SizedBox(height: 32),
+
+        // More Posts
+        ...posts.skip(1).map((post) => PostCard(post: post)).toList(),
       ],
+    );
+  }
+
+  Widget _buildSectionHeader(String title) {
+    return Padding(
+      padding: const EdgeInsets.symmetric(horizontal: 20),
+      child: Row(
+        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+        children: [
+          Text(title,
+              style: const TextStyle(
+                  color: Colors.white,
+                  fontSize: 18,
+                  fontWeight: FontWeight.bold)),
+          const Text('See all',
+              style: TextStyle(color: AppColors.secondary, fontSize: 13)),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildSuggestedPlayCard(SuggestedPlay play) {
+    return Container(
+      width: 140,
+      decoration: BoxDecoration(
+        borderRadius: BorderRadius.circular(16),
+        image:
+            DecorationImage(image: NetworkImage(play.image), fit: BoxFit.cover),
+      ),
+      child: Container(
+        padding: const EdgeInsets.all(12),
+        decoration: BoxDecoration(
+          borderRadius: BorderRadius.circular(16),
+          gradient: LinearGradient(
+              begin: Alignment.topCenter,
+              end: Alignment.bottomCenter,
+              colors: [Colors.transparent, Colors.black.withOpacity(0.8)]),
+        ),
+        child: Column(
+          children: [
+            const Spacer(),
+            Text(play.title,
+                style: const TextStyle(
+                    color: Colors.white,
+                    fontSize: 12,
+                    fontWeight: FontWeight.bold),
+                maxLines: 2,
+                overflow: TextOverflow.ellipsis),
+            const SizedBox(height: 4),
+            Row(
+              children: [
+                CircleAvatar(
+                    radius: 8, backgroundImage: NetworkImage(play.userAvatar)),
+                const SizedBox(width: 4),
+                Expanded(
+                    child: Text(play.userName,
+                        style: const TextStyle(
+                            color: Colors.white70, fontSize: 10),
+                        overflow: TextOverflow.ellipsis)),
+              ],
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+
+  Widget _buildTrendingPlayerCard(TrendingPlayer player) {
+    return Container(
+      width: 160,
+      decoration: BoxDecoration(
+        color: AppColors.card,
+        borderRadius: BorderRadius.circular(20),
+        border: Border.all(color: Colors.white.withOpacity(0.05)),
+      ),
+      child: Column(
+        children: [
+          Expanded(
+            child: ClipRRect(
+              borderRadius:
+                  const BorderRadius.vertical(top: Radius.circular(20)),
+              child: Image.network(player.image,
+                  fit: BoxFit.cover, width: double.infinity),
+            ),
+          ),
+          Padding(
+            padding: const EdgeInsets.all(12),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text(player.name,
+                    style: const TextStyle(
+                        color: Colors.white, fontWeight: FontWeight.bold)),
+                const SizedBox(height: 2),
+                Row(
+                  children: [
+                    Container(
+                        width: 8,
+                        height: 8,
+                        decoration: BoxDecoration(
+                            color: player.teamColor, shape: BoxShape.circle)),
+                    const SizedBox(width: 6),
+                    Text(player.team,
+                        style:
+                            const TextStyle(color: Colors.grey, fontSize: 11)),
+                  ],
+                ),
+                const SizedBox(height: 8),
+                Container(
+                  width: double.infinity,
+                  padding: const EdgeInsets.symmetric(vertical: 4),
+                  decoration: BoxDecoration(
+                      color: Colors.white.withOpacity(0.05),
+                      border: Border.all(color: Colors.white.withOpacity(0.1)),
+                      borderRadius: BorderRadius.circular(8)),
+                  child: const Center(
+                      child: Text('Follow',
+                          style: TextStyle(color: Colors.white, fontSize: 12))),
+                ),
+              ],
+            ),
+          ),
+        ],
+      ),
     );
   }
 
   Widget _buildStoryItem(int index) {
     final names = ['Sami_tyi', 'Vinmi_cio', 'Lashotd93', 'Jefferson', 'Mahrez'];
+    final avatars = [
+      'https://images.unsplash.com/photo-1506794778202-cad84cf45f1d?q=80&w=200&h=200&auto=format&fit=crop',
+      'https://images.unsplash.com/photo-1628891890467-b79f2c8ba9dc?q=80&w=200&h=200&auto=format&fit=crop',
+      'https://images.unsplash.com/photo-1500648767791-00dcc994a43e?q=80&w=200&h=200&auto=format&fit=crop',
+      'https://images.unsplash.com/photo-1570295999919-56ceb5ecca61?q=80&w=200&h=200&auto=format&fit=crop',
+      'https://images.unsplash.com/photo-1568602471122-7832951cc4c5?q=80&w=200&h=200&auto=format&fit=crop',
+    ];
     return Column(
       children: [
         Container(
@@ -57,16 +223,19 @@ class FeedScreen extends StatelessWidget {
           decoration: BoxDecoration(
             shape: BoxShape.circle,
             gradient: index % 2 == 0
-                ? const LinearGradient(colors: [Colors.white, Color(0xFF94A3B8)])
-                : const LinearGradient(colors: [Color(0xFF3F3F46), Color(0xFF18181B)]),
+                ? const LinearGradient(
+                    colors: [Colors.white, Color(0xFF94A3B8)])
+                : const LinearGradient(
+                    colors: [Color(0xFF3F3F46), Color(0xFF18181B)]),
           ),
           child: CircleAvatar(
             radius: 30,
-            backgroundImage: NetworkImage('https://i.pravatar.cc/150?u=$index'),
+            backgroundImage: NetworkImage(avatars[index]),
           ),
         ),
         const SizedBox(height: 4),
-        Text(names[index], style: const TextStyle(fontSize: 11, color: Colors.white)),
+        Text(names[index],
+            style: const TextStyle(fontSize: 11, color: Colors.white)),
       ],
     );
   }
@@ -107,19 +276,21 @@ class OpportunitiesScreen extends StatelessWidget {
             backgroundColor: AppColors.background.withOpacity(0.9),
             floating: true,
             pinned: true,
-            title: const Text('Opportunités', style: TextStyle(fontWeight: FontWeight.bold)),
+            title: const Text('Opportunités',
+                style: TextStyle(fontWeight: FontWeight.bold)),
             actions: [
-               IconButton(
-                 icon: const Icon(Icons.location_on, size: 20, color: Colors.blue),
-                 onPressed: () {
-                    showModalBottomSheet(
-                      context: context,
-                      isScrollControlled: true,
-                      backgroundColor: Colors.transparent,
-                      builder: (context) => const LocationModal(),
-                    );
-                 },
-               ),
+              IconButton(
+                icon:
+                    const Icon(Icons.location_on, size: 20, color: Colors.blue),
+                onPressed: () {
+                  showModalBottomSheet(
+                    context: context,
+                    isScrollControlled: true,
+                    backgroundColor: Colors.transparent,
+                    builder: (context) => const LocationModal(),
+                  );
+                },
+              ),
             ],
             bottom: PreferredSize(
               preferredSize: const Size.fromHeight(60),
@@ -132,19 +303,20 @@ class OpportunitiesScreen extends StatelessWidget {
                     prefixIcon: const Icon(Icons.search, color: Colors.grey),
                     filled: true,
                     fillColor: const Color(0xFF1E232E),
-                    border: OutlineInputBorder(borderRadius: BorderRadius.circular(12), borderSide: BorderSide.none),
+                    border: OutlineInputBorder(
+                        borderRadius: BorderRadius.circular(12),
+                        borderSide: BorderSide.none),
                     contentPadding: const EdgeInsets.symmetric(vertical: 0),
                   ),
                 ),
               ),
             ),
           ),
-          
-          // Featured Horizontal List
           SliverToBoxAdapter(
             child: Padding(
               padding: const EdgeInsets.only(left: 16, top: 16, bottom: 8),
-              child: const Text('À la une', style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold)),
+              child: const Text('À la une',
+                  style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold)),
             ),
           ),
           SliverToBoxAdapter(
@@ -170,24 +342,39 @@ class OpportunitiesScreen extends StatelessWidget {
                         Row(
                           children: [
                             Container(
-                              width: 40, height: 40,
+                              width: 40,
+                              height: 40,
                               padding: const EdgeInsets.all(4),
-                              decoration: BoxDecoration(color: Colors.white, borderRadius: BorderRadius.circular(8)),
+                              decoration: BoxDecoration(
+                                  color: Colors.white,
+                                  borderRadius: BorderRadius.circular(8)),
                               child: Image.network(opp.clubLogo),
                             ),
                             const Spacer(),
-                            const Icon(Icons.bookmark_border, color: Colors.white),
+                            const Icon(Icons.bookmark_border,
+                                color: Colors.white),
                           ],
                         ),
                         const Spacer(),
                         Container(
-                          padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
-                          decoration: BoxDecoration(color: Colors.white24, borderRadius: BorderRadius.circular(4)),
-                          child: Text(opp.type.toUpperCase(), style: const TextStyle(fontSize: 10, fontWeight: FontWeight.bold)),
+                          padding: const EdgeInsets.symmetric(
+                              horizontal: 6, vertical: 2),
+                          decoration: BoxDecoration(
+                              color: Colors.white24,
+                              borderRadius: BorderRadius.circular(4)),
+                          child: Text(opp.type.toUpperCase(),
+                              style: const TextStyle(
+                                  fontSize: 10, fontWeight: FontWeight.bold)),
                         ),
                         const SizedBox(height: 4),
-                        Text(opp.title, style: const TextStyle(fontSize: 18, fontWeight: FontWeight.bold, height: 1.1)),
-                        Text(opp.club, style: const TextStyle(fontSize: 12, color: Colors.white70)),
+                        Text(opp.title,
+                            style: const TextStyle(
+                                fontSize: 18,
+                                fontWeight: FontWeight.bold,
+                                height: 1.1)),
+                        Text(opp.club,
+                            style: const TextStyle(
+                                fontSize: 12, color: Colors.white70)),
                       ],
                     ),
                   );
@@ -195,12 +382,11 @@ class OpportunitiesScreen extends StatelessWidget {
               ),
             ),
           ),
-
-          // List Items
           SliverToBoxAdapter(
             child: Padding(
               padding: const EdgeInsets.only(left: 16, top: 24, bottom: 8),
-              child: const Text('Tout', style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold)),
+              child: const Text('Tout',
+                  style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold)),
             ),
           ),
           SliverList(
@@ -208,7 +394,8 @@ class OpportunitiesScreen extends StatelessWidget {
               (context, index) {
                 final opp = others[index];
                 return Padding(
-                  padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 6),
+                  padding:
+                      const EdgeInsets.symmetric(horizontal: 16, vertical: 6),
                   child: Container(
                     padding: const EdgeInsets.all(12),
                     decoration: BoxDecoration(
@@ -219,18 +406,25 @@ class OpportunitiesScreen extends StatelessWidget {
                     child: Row(
                       children: [
                         Container(
-                           width: 50, height: 50,
-                           padding: const EdgeInsets.all(6),
-                           decoration: BoxDecoration(color: const Color(0xFF2C2C2E), borderRadius: BorderRadius.circular(10)),
-                           child: Image.network(opp.clubLogo),
+                          width: 50,
+                          height: 50,
+                          padding: const EdgeInsets.all(6),
+                          decoration: BoxDecoration(
+                              color: const Color(0xFF2C2C2E),
+                              borderRadius: BorderRadius.circular(10)),
+                          child: Image.network(opp.clubLogo),
                         ),
                         const SizedBox(width: 12),
                         Expanded(
                           child: Column(
                             crossAxisAlignment: CrossAxisAlignment.start,
                             children: [
-                              Text(opp.title, style: const TextStyle(fontWeight: FontWeight.bold)),
-                              Text('${opp.club} • ${opp.location}', style: const TextStyle(fontSize: 12, color: Colors.grey)),
+                              Text(opp.title,
+                                  style: const TextStyle(
+                                      fontWeight: FontWeight.bold)),
+                              Text('${opp.club} • ${opp.location}',
+                                  style: const TextStyle(
+                                      fontSize: 12, color: Colors.grey)),
                             ],
                           ),
                         ),
@@ -254,7 +448,8 @@ class SoccerMapPage extends StatefulWidget {
   final VoidCallback onBack;
   final Function(FieldData) onVenueClick;
 
-  const SoccerMapPage({super.key, required this.onBack, required this.onVenueClick});
+  const SoccerMapPage(
+      {super.key, required this.onBack, required this.onVenueClick});
 
   @override
   State<SoccerMapPage> createState() => _SoccerMapPageState();
@@ -279,42 +474,33 @@ class _SoccerMapPageState extends State<SoccerMapPage> {
             ),
             children: [
               TileLayer(
-                urlTemplate: 'https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png',
+                urlTemplate:
+                    'https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png',
                 subdomains: const ['a', 'b', 'c', 'd'],
               ),
               MarkerLayer(
                 markers: soccerFields.map((field) {
-                  final isSelected = _selectedField?.id == field.id;
-                  final isActive = field.playersPresent > 0;
                   return Marker(
                     point: LatLng(field.lat, field.lng),
-                    width: 60,
-                    height: 60,
+                    width: 40,
+                    height: 40,
                     child: GestureDetector(
                       onTap: () {
                         setState(() => _selectedField = field);
                         _mapController.move(LatLng(field.lat, field.lng), 14.0);
                       },
-                      child: Column(
-                        mainAxisSize: MainAxisSize.min,
-                        children: [
-                          if (isSelected)
-                            Container(
-                              padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
-                              decoration: BoxDecoration(color: Colors.white, borderRadius: BorderRadius.circular(4)),
-                              child: Text(field.name, style: const TextStyle(color: Colors.black, fontSize: 10, fontWeight: FontWeight.bold)),
-                            ),
-                          Container(
-                            width: 32,
-                            height: 32,
-                            decoration: BoxDecoration(
-                              color: isSelected ? Colors.white : (isActive ? const Color(0xFFFF453A) : Colors.grey[600]),
-                              shape: BoxShape.circle,
-                              border: Border.all(color: isSelected ? Colors.blue : Colors.white, width: 2),
-                            ),
-                            child: Icon(Icons.sports_soccer, size: 18, color: isSelected ? Colors.blue : Colors.white),
-                          ),
-                        ],
+                      child: Container(
+                        padding: const EdgeInsets.all(8),
+                        decoration: BoxDecoration(
+                          color: Colors.blue,
+                          shape: BoxShape.circle,
+                          border: Border.all(color: Colors.white, width: 2),
+                          boxShadow: const [
+                            BoxShadow(color: Colors.black26, blurRadius: 4)
+                          ],
+                        ),
+                        child: const Icon(Icons.sports_soccer,
+                            color: Colors.white, size: 20),
                       ),
                     ),
                   );
@@ -322,33 +508,36 @@ class _SoccerMapPageState extends State<SoccerMapPage> {
               ),
             ],
           ),
-          
-          // Top Search Bar
           Positioned(
             top: MediaQuery.of(context).padding.top + 10,
-            left: 16,
-            right: 16,
+            left: 20,
+            right: 20,
             child: Row(
               children: [
                 GestureDetector(
                   onTap: widget.onBack,
                   child: Container(
-                    width: 40, height: 40,
-                    decoration: BoxDecoration(color: Colors.black45, borderRadius: BorderRadius.circular(20)),
+                    padding: const EdgeInsets.all(12),
+                    decoration: BoxDecoration(
+                        color: Colors.black.withOpacity(0.5),
+                        shape: BoxShape.circle),
                     child: const Icon(Icons.arrow_back, color: Colors.white),
                   ),
                 ),
                 const SizedBox(width: 12),
                 Expanded(
                   child: Container(
-                    height: 40,
-                    padding: const EdgeInsets.symmetric(horizontal: 12),
-                    decoration: BoxDecoration(color: Colors.black45, borderRadius: BorderRadius.circular(12)),
+                    height: 50,
+                    padding: const EdgeInsets.symmetric(horizontal: 16),
+                    decoration: BoxDecoration(
+                        color: Colors.black.withOpacity(0.5),
+                        borderRadius: BorderRadius.circular(25)),
                     child: Row(
                       children: const [
-                        Icon(Icons.search, color: Colors.grey, size: 18),
+                        Icon(Icons.search, color: Colors.white70),
                         SizedBox(width: 8),
-                        Text('Rechercher un terrain...', style: TextStyle(color: Colors.grey, fontSize: 14)),
+                        Text('Rechercher un terrain...',
+                            style: TextStyle(color: Colors.white70)),
                       ],
                     ),
                   ),
@@ -356,47 +545,55 @@ class _SoccerMapPageState extends State<SoccerMapPage> {
               ],
             ),
           ),
-
-          // Selected Field Card
           if (_selectedField != null)
             Positioned(
-              bottom: 100,
-              left: 16,
-              right: 16,
+              bottom: 40,
+              left: 20,
+              right: 20,
               child: GestureDetector(
                 onTap: () => widget.onVenueClick(_selectedField!),
                 child: Container(
                   padding: const EdgeInsets.all(16),
                   decoration: BoxDecoration(
-                    color: const Color(0xFF1C1C1E).withOpacity(0.95),
-                    borderRadius: BorderRadius.circular(20),
-                    border: Border.all(color: Colors.white10),
-                  ),
+                      color: const Color(0xFF1C1C1E),
+                      borderRadius: BorderRadius.circular(20),
+                      border: Border.all(color: Colors.white10)),
                   child: Row(
                     children: [
                       ClipRRect(
                         borderRadius: BorderRadius.circular(12),
-                        child: Image.network(_selectedField!.image, width: 80, height: 80, fit: BoxFit.cover),
+                        child: Image.network(_selectedField!.image,
+                            width: 80, height: 80, fit: BoxFit.cover),
                       ),
                       const SizedBox(width: 16),
                       Expanded(
                         child: Column(
                           crossAxisAlignment: CrossAxisAlignment.start,
                           children: [
-                            Text(_selectedField!.name, style: const TextStyle(color: Colors.white, fontSize: 16, fontWeight: FontWeight.bold)),
-                            const SizedBox(height: 4),
-                            Text('${_selectedField!.type} • ${_selectedField!.distance}', style: const TextStyle(color: Colors.grey, fontSize: 12)),
+                            Text(_selectedField!.name,
+                                style: const TextStyle(
+                                    fontWeight: FontWeight.bold, fontSize: 18)),
+                            Text(_selectedField!.location,
+                                style: const TextStyle(
+                                    color: Colors.grey, fontSize: 13)),
                             const SizedBox(height: 8),
                             Row(
                               children: [
-                                Icon(Icons.group, size: 14, color: _selectedField!.playersPresent > 0 ? Colors.green : Colors.grey),
+                                const Icon(Icons.people,
+                                    size: 14, color: Colors.blue),
                                 const SizedBox(width: 4),
-                                Text('${_selectedField!.playersPresent} Joueurs présents', style: TextStyle(color: _selectedField!.playersPresent > 0 ? Colors.green : Colors.grey, fontSize: 12)),
+                                Text(
+                                    '${_selectedField!.playersPresent} joueurs',
+                                    style: const TextStyle(
+                                        color: Colors.blue,
+                                        fontSize: 12,
+                                        fontWeight: FontWeight.bold)),
                               ],
                             ),
                           ],
                         ),
                       ),
+                      const Icon(Icons.chevron_right, color: Colors.grey),
                     ],
                   ),
                 ),
@@ -412,166 +609,102 @@ class VenueDetailsPage extends StatelessWidget {
   final FieldData venue;
   final VoidCallback onBack;
 
-  const VenueDetailsPage({super.key, required this.venue, required this.onBack});
+  const VenueDetailsPage(
+      {super.key, required this.venue, required this.onBack});
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: AppColors.background,
-      body: Stack(
-        children: [
-          CustomScrollView(
-            slivers: [
-              SliverAppBar(
-                expandedHeight: 250,
-                pinned: true,
-                backgroundColor: AppColors.background,
-                leading: IconButton(
-                  icon: Container(
-                    padding: const EdgeInsets.all(8),
-                    decoration: const BoxDecoration(color: Colors.black45, shape: BoxShape.circle),
-                    child: const Icon(Icons.arrow_back, color: Colors.white),
-                  ),
-                  onPressed: onBack,
-                ),
-                flexibleSpace: FlexibleSpaceBar(
-                  background: Stack(
-                    fit: StackFit.expand,
-                    children: [
-                      Image.network(venue.image, fit: BoxFit.cover),
-                      Container(
-                        decoration: BoxDecoration(
-                          gradient: LinearGradient(
-                            begin: Alignment.topCenter,
-                            end: Alignment.bottomCenter,
-                            colors: [Colors.transparent, AppColors.background],
-                          ),
-                        ),
-                      ),
-                    ],
-                  ),
-                ),
-              ),
-              SliverToBoxAdapter(
-                child: Padding(
-                  padding: const EdgeInsets.all(20),
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      Row(
-                        children: [
-                          Container(
-                            padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 4),
-                            decoration: BoxDecoration(color: Colors.green.withOpacity(0.2), borderRadius: BorderRadius.circular(20), border: Border.all(color: Colors.green.withOpacity(0.3))),
-                            child: const Text('Open Now', style: TextStyle(color: Colors.green, fontSize: 10, fontWeight: FontWeight.bold)),
-                          ),
-                          const SizedBox(width: 8),
-                          Container(
-                            padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 4),
-                            decoration: BoxDecoration(color: Colors.white10, borderRadius: BorderRadius.circular(20)),
-                            child: Row(
-                              children: [
-                                const Icon(Icons.circle, color: Colors.green, size: 8),
-                                const SizedBox(width: 4),
-                                Text('${venue.playersPresent} Players Live', style: const TextStyle(color: Colors.white, fontSize: 10, fontWeight: FontWeight.bold)),
-                              ],
-                            ),
-                          ),
-                        ],
-                      ),
-                      const SizedBox(height: 16),
-                      Text(venue.name, style: const TextStyle(color: Colors.white, fontSize: 28, fontWeight: FontWeight.bold)),
-                      const SizedBox(height: 8),
-                      Row(
-                        children: [
-                          const Icon(Icons.location_on, color: Colors.grey, size: 16),
-                          const SizedBox(width: 4),
-                          Text(venue.location, style: const TextStyle(color: Colors.grey, fontSize: 14)),
-                        ],
-                      ),
-                      const SizedBox(height: 24),
-                      
-                      // Park Level
-                      Container(
-                        padding: const EdgeInsets.all(16),
-                        decoration: BoxDecoration(color: const Color(0xFF1C1F26), borderRadius: BorderRadius.circular(16), border: Border.all(color: Colors.white10)),
-                        child: Row(
-                          children: [
-                            Container(
-                              padding: const EdgeInsets.all(8),
-                              decoration: BoxDecoration(color: const Color(0xFF252A33), shape: BoxShape.circle),
-                              child: const Icon(Icons.signal_cellular_alt, color: Colors.green),
-                            ),
-                            const SizedBox(width: 16),
-                            Column(
-                              crossAxisAlignment: CrossAxisAlignment.start,
-                              children: const [
-                                Text('PARK LEVEL', style: TextStyle(color: Colors.grey, fontSize: 10, fontWeight: FontWeight.bold)),
-                                Text('Advanced', style: TextStyle(color: Colors.white, fontSize: 14, fontWeight: FontWeight.bold)),
-                              ],
-                            ),
-                            const Spacer(),
-                            const Icon(Icons.equalizer, color: Colors.green, size: 28),
-                          ],
-                        ),
-                      ),
-                      const SizedBox(height: 100), // Space for bottom bar
-                    ],
-                  ),
-                ),
-              ),
-            ],
+      backgroundColor: const Color(0xFF0F1115),
+      body: CustomScrollView(
+        slivers: [
+          SliverAppBar(
+            expandedHeight: 300,
+            pinned: true,
+            leading: IconButton(
+                icon: const Icon(Icons.arrow_back), onPressed: onBack),
+            flexibleSpace: FlexibleSpaceBar(
+              background: Image.network(venue.image, fit: BoxFit.cover),
+            ),
           ),
-          
-          // Bottom Bar
-          Positioned(
-            bottom: 0,
-            left: 0,
-            right: 0,
-            child: Container(
-              padding: const EdgeInsets.fromLTRB(20, 20, 20, 40),
-              decoration: BoxDecoration(
-                gradient: LinearGradient(
-                  begin: Alignment.bottomCenter,
-                  end: Alignment.topCenter,
-                  colors: [AppColors.background, AppColors.background.withOpacity(0)],
-                ),
-              ),
-              child: Row(
+          SliverToBoxAdapter(
+            child: Padding(
+              padding: const EdgeInsets.all(24),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  Expanded(
-                    child: ElevatedButton.icon(
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                    children: [
+                      Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Text(venue.name,
+                              style: const TextStyle(
+                                  fontSize: 28, fontWeight: FontWeight.bold)),
+                          Text(venue.location,
+                              style: const TextStyle(
+                                  color: Colors.grey, fontSize: 16)),
+                        ],
+                      ),
+                      Container(
+                        padding: const EdgeInsets.symmetric(
+                            horizontal: 12, vertical: 6),
+                        decoration: BoxDecoration(
+                            color: Colors.blue.withOpacity(0.1),
+                            borderRadius: BorderRadius.circular(8)),
+                        child: Text(venue.distance,
+                            style: const TextStyle(
+                                color: Colors.blue,
+                                fontWeight: FontWeight.bold)),
+                      ),
+                    ],
+                  ),
+                  const SizedBox(height: 24),
+                  Row(
+                    children: [
+                      _buildInfoIcon(Icons.sports_soccer, venue.type),
+                      const SizedBox(width: 24),
+                      _buildInfoIcon(
+                          Icons.people, '${venue.playersPresent} Présents'),
+                      const SizedBox(width: 24),
+                      _buildInfoIcon(Icons.star, '4.8'),
+                    ],
+                  ),
+                  const SizedBox(height: 32),
+                  const Text('Description',
+                      style:
+                          TextStyle(fontSize: 18, fontWeight: FontWeight.bold)),
+                  const SizedBox(height: 8),
+                  const Text(
+                    'Terrain de haute qualité idéal pour les matchs entre amis. Éclairage nocturne disponible. Ambiance compétitive et amicale.',
+                    style: TextStyle(color: Colors.grey, height: 1.5),
+                  ),
+                  const SizedBox(height: 32),
+                  SizedBox(
+                    width: double.infinity,
+                    height: 56,
+                    child: ElevatedButton(
                       onPressed: () {
                         showModalBottomSheet(
                           context: context,
                           isScrollControlled: true,
                           backgroundColor: Colors.transparent,
-                          builder: (context) => CheckInModal(venueName: venue.name),
+                          builder: (context) => const CheckInModal(),
                         );
                       },
-                      icon: const Icon(Icons.check_circle, color: Colors.green),
-                      label: const Text('Check In', style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold)),
                       style: ElevatedButton.styleFrom(
-                        backgroundColor: const Color(0xFF2C2C2E),
-                        padding: const EdgeInsets.symmetric(vertical: 16),
-                        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
-                      ),
+                          backgroundColor: Colors.blue,
+                          shape: RoundedRectangleBorder(
+                              borderRadius: BorderRadius.circular(16))),
+                      child: const Text('Check In',
+                          style: TextStyle(
+                              color: Colors.white,
+                              fontSize: 16,
+                              fontWeight: FontWeight.bold)),
                     ),
                   ),
-                  const SizedBox(width: 12),
-                  Expanded(
-                    flex: 2,
-                    child: ElevatedButton.icon(
-                      onPressed: () {},
-                      icon: const Icon(Icons.directions, color: Colors.black),
-                      label: const Text('Get Directions', style: TextStyle(color: Colors.black, fontWeight: FontWeight.bold)),
-                      style: ElevatedButton.styleFrom(
-                        backgroundColor: Colors.green,
-                        padding: const EdgeInsets.symmetric(vertical: 16),
-                        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
-                      ),
-                    ),
-                  ),
+                  const SizedBox(height: 100),
                 ],
               ),
             ),
@@ -580,104 +713,82 @@ class VenueDetailsPage extends StatelessWidget {
       ),
     );
   }
+
+  Widget _buildInfoIcon(IconData icon, String label) {
+    return Column(
+      children: [
+        Icon(icon, color: Colors.grey, size: 24),
+        const SizedBox(height: 4),
+        Text(label, style: const TextStyle(color: Colors.grey, fontSize: 12)),
+      ],
+    );
+  }
 }
 
 class CheckInModal extends StatefulWidget {
-  final String venueName;
-
-  const CheckInModal({super.key, required this.venueName});
+  const CheckInModal({super.key});
 
   @override
   State<CheckInModal> createState() => _CheckInModalState();
 }
 
 class _CheckInModalState extends State<CheckInModal> {
-  String _dateType = 'today';
-  String _selectedTime = '18:00';
-
   @override
   Widget build(BuildContext context) {
     return Container(
+      height: MediaQuery.of(context).size.height * 0.7,
       decoration: const BoxDecoration(
-        color: Color(0xFF1C1F26),
+        color: Color(0xFF1E1E1E),
         borderRadius: BorderRadius.vertical(top: Radius.circular(32)),
       ),
-      padding: const EdgeInsets.fromLTRB(24, 12, 24, 40),
       child: Column(
-        mainAxisSize: MainAxisSize.min,
-        crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          Center(
-            child: Container(width: 40, height: 4, decoration: BoxDecoration(color: Colors.white24, borderRadius: BorderRadius.circular(2))),
-          ),
-          const SizedBox(height: 24),
-          Row(
-            children: [
-              Container(
-                padding: const EdgeInsets.all(12),
-                decoration: BoxDecoration(color: Colors.green.withOpacity(0.2), shape: BoxShape.circle, border: Border.all(color: Colors.green.withOpacity(0.3))),
-                child: const Icon(Icons.check_circle, color: Colors.green, size: 24),
-              ),
-              const SizedBox(width: 12),
-              Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  const Text('Check-in', style: TextStyle(color: Colors.white, fontSize: 20, fontWeight: FontWeight.bold)),
-                  Text(widget.venueName, style: const TextStyle(color: Colors.grey, fontSize: 12)),
-                ],
-              ),
-            ],
-          ),
-          const SizedBox(height: 24),
-          const Text('DATE', style: TextStyle(color: Colors.grey, fontSize: 10, fontWeight: FontWeight.bold, letterSpacing: 1)),
           const SizedBox(height: 12),
           Container(
-            padding: const EdgeInsets.all(4),
-            decoration: BoxDecoration(color: const Color(0xFF151518), borderRadius: BorderRadius.circular(12), border: Border.all(color: Colors.white10)),
+              width: 40,
+              height: 4,
+              decoration: BoxDecoration(
+                  color: Colors.white24,
+                  borderRadius: BorderRadius.circular(2))),
+          Padding(
+            padding: const EdgeInsets.all(24),
             child: Row(
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
-                _buildDateTab('Aujourd\'hui', 'today'),
-                _buildDateTab('Demain', 'tomorrow'),
-                _buildDateTab('Autre', 'other'),
+                const Text('Check In',
+                    style:
+                        TextStyle(fontSize: 24, fontWeight: FontWeight.bold)),
+                IconButton(
+                    icon: const Icon(Icons.close),
+                    onPressed: () => Navigator.pop(context)),
               ],
             ),
           ),
-          const SizedBox(height: 24),
-          const Text('HEURE D\'ARRIVÉE', style: TextStyle(color: Colors.grey, fontSize: 10, fontWeight: FontWeight.bold, letterSpacing: 1)),
-          const SizedBox(height: 12),
-          SingleChildScrollView(
-            scrollDirection: Axis.horizontal,
-            child: Row(
-              children: ['17:00', '17:30', '18:00', '18:30', '19:00', '19:30'].map((time) {
-                final isSelected = _selectedTime == time;
-                return GestureDetector(
-                  onTap: () => setState(() => _selectedTime = time),
-                  child: Container(
-                    margin: const EdgeInsets.only(right: 8),
-                    padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 10),
-                    decoration: BoxDecoration(
-                      color: isSelected ? Colors.green : const Color(0xFF151518),
-                      borderRadius: BorderRadius.circular(12),
-                      border: Border.all(color: isSelected ? Colors.green : Colors.white10),
-                    ),
-                    child: Text(time, style: TextStyle(color: isSelected ? Colors.black : Colors.grey, fontWeight: FontWeight.bold)),
+          Expanded(
+            child: ListView(
+              padding: const EdgeInsets.symmetric(horizontal: 24),
+              children: [
+                const Text('Choisir une session',
+                    style: TextStyle(color: Colors.grey)),
+                const SizedBox(height: 16),
+                _buildDateTab('CE SOIR', '18:00 - 20:00'),
+                _buildDateTab('DEMAIN', '17:00 - 19:00'),
+                const SizedBox(height: 32),
+                SizedBox(
+                  width: double.infinity,
+                  height: 56,
+                  child: ElevatedButton(
+                    onPressed: () => Navigator.pop(context),
+                    style: ElevatedButton.styleFrom(
+                        backgroundColor: Colors.blue,
+                        shape: RoundedRectangleBorder(
+                            borderRadius: BorderRadius.circular(16))),
+                    child: const Text('Confirmer',
+                        style: TextStyle(
+                            color: Colors.white, fontWeight: FontWeight.bold)),
                   ),
-                );
-              }).toList(),
-            ),
-          ),
-          const SizedBox(height: 32),
-          SizedBox(
-            width: double.infinity,
-            child: ElevatedButton.icon(
-              onPressed: () => Navigator.pop(context),
-              icon: const Icon(Icons.check, color: Colors.black),
-              label: const Text('Confirmer ma présence', style: TextStyle(color: Colors.black, fontWeight: FontWeight.bold, fontSize: 16)),
-              style: ElevatedButton.styleFrom(
-                backgroundColor: Colors.white,
-                padding: const EdgeInsets.symmetric(vertical: 16),
-                shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
-              ),
+                ),
+              ],
             ),
           ),
         ],
@@ -686,19 +797,27 @@ class _CheckInModalState extends State<CheckInModal> {
   }
 
   Widget _buildDateTab(String label, String value) {
-    final isSelected = _dateType == value;
-    return Expanded(
-      child: GestureDetector(
-        onTap: () => setState(() => _dateType = value),
-        child: Container(
-          padding: const EdgeInsets.symmetric(vertical: 10),
-          decoration: BoxDecoration(
-            color: isSelected ? const Color(0xFF2C2C2E) : Colors.transparent,
-            borderRadius: BorderRadius.circular(8),
-          ),
-          alignment: Alignment.center,
-          child: Text(label, style: TextStyle(color: isSelected ? Colors.white : Colors.grey, fontWeight: FontWeight.bold, fontSize: 12)),
-        ),
+    return Container(
+      margin: const EdgeInsets.only(bottom: 12),
+      padding: const EdgeInsets.all(16),
+      decoration: BoxDecoration(
+        color: Colors.white.withOpacity(0.05),
+        borderRadius: BorderRadius.circular(16),
+        border: Border.all(color: Colors.white.withOpacity(0.1)),
+      ),
+      child: Row(
+        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+        children: [
+          Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
+            Text(label,
+                style: const TextStyle(
+                    color: Colors.blue,
+                    fontSize: 10,
+                    fontWeight: FontWeight.bold)),
+            Text(value, style: const TextStyle(fontWeight: FontWeight.bold)),
+          ]),
+          const Icon(Icons.radio_button_off, color: Colors.grey),
+        ],
       ),
     );
   }

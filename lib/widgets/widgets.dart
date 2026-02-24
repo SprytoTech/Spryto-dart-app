@@ -20,7 +20,8 @@ class GlassHeader extends StatelessWidget {
           ),
           decoration: BoxDecoration(
             color: AppColors.background.withOpacity(0.8),
-            border: const Border(bottom: BorderSide(color: AppColors.glassBorder)),
+            border:
+                const Border(bottom: BorderSide(color: AppColors.glassBorder)),
           ),
           child: Row(
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
@@ -33,6 +34,7 @@ class GlassHeader extends StatelessWidget {
                   fontWeight: FontWeight.w900,
                   fontStyle: FontStyle.italic,
                   color: Colors.white,
+                  letterSpacing: -1,
                 ),
               ),
               Row(
@@ -58,7 +60,7 @@ class PostCard extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Container(
-      margin: const EdgeInsets.only(bottom: 30, left: 10, right: 10),
+      margin: const EdgeInsets.only(bottom: 24, left: 16, right: 16),
       decoration: BoxDecoration(
         color: const Color(0xFF1E1E23).withOpacity(0.4),
         borderRadius: BorderRadius.circular(24),
@@ -68,35 +70,88 @@ class PostCard extends StatelessWidget {
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           ListTile(
-            leading: CircleAvatar(backgroundImage: NetworkImage(post.user.avatar)),
-            title: Text(post.user.name, style: const TextStyle(fontWeight: FontWeight.bold, color: Colors.white)),
-            subtitle: Text('${post.position} - ${post.user.team}', style: const TextStyle(fontSize: 10, color: Colors.grey)),
+            leading: Stack(
+              children: [
+                CircleAvatar(backgroundImage: NetworkImage(post.user.avatar)),
+                if (post.user.isOnline)
+                  Positioned(
+                    right: 0,
+                    bottom: 0,
+                    child: Container(
+                      width: 10,
+                      height: 10,
+                      decoration: BoxDecoration(
+                        color: Colors.green,
+                        shape: BoxShape.circle,
+                        border: Border.all(color: AppColors.card, width: 2),
+                      ),
+                    ),
+                  ),
+              ],
+            ),
+            title: Text(post.user.name,
+                style: const TextStyle(
+                    fontWeight: FontWeight.bold, color: Colors.white)),
+            subtitle: Text('${post.position} - ${post.user.team}',
+                style: const TextStyle(fontSize: 10, color: Colors.grey)),
             trailing: const Icon(Icons.more_horiz, color: Colors.grey),
           ),
+          if (post.content.isNotEmpty)
+            Padding(
+              padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+              child: Text(post.content,
+                  style: const TextStyle(color: Colors.white, fontSize: 14)),
+            ),
           if (post.image != null)
-            Container(
-              height: 400,
-              decoration: BoxDecoration(
-                image: DecorationImage(image: NetworkImage(post.image!), fit: BoxFit.cover),
-              ),
-              child: const Center(
-                  child: Icon(Icons.play_circle_fill, size: 48, color: Colors.white70),
+            ClipRRect(
+              borderRadius: BorderRadius.circular(16),
+              child: Container(
+                height: 350,
+                width: double.infinity,
+                margin: const EdgeInsets.symmetric(horizontal: 12),
+                decoration: BoxDecoration(
+                  image: DecorationImage(
+                      image: NetworkImage(post.image!), fit: BoxFit.cover),
+                ),
+                child: Center(
+                  child: Container(
+                    padding: const EdgeInsets.all(12),
+                    decoration: BoxDecoration(
+                        color: Colors.black26, shape: BoxShape.circle),
+                    child: const Icon(Icons.play_circle_fill,
+                        size: 40, color: Colors.white),
+                  ),
+                ),
               ),
             ),
           Padding(
-            padding: const EdgeInsets.all(12.0),
+            padding: const EdgeInsets.all(16.0),
             child: Row(
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
                 Row(
                   children: [
-                    const Icon(Icons.sports_soccer, size: 18, color: Colors.grey),
-                    const SizedBox(width: 4),
-                    Text('${post.ratingCount}K', style: const TextStyle(color: Colors.grey)),
+                    _buildReactionAvatars(post.recentReactions),
+                    const SizedBox(width: 8),
+                    Text('${post.reactionCount}',
+                        style: const TextStyle(
+                            color: Colors.white,
+                            fontSize: 13,
+                            fontWeight: FontWeight.bold)),
                     const SizedBox(width: 16),
-                    const Icon(Icons.chat_bubble_outline, size: 18, color: Colors.grey),
+                    const Icon(Icons.sports_soccer,
+                        size: 18, color: Colors.grey),
                     const SizedBox(width: 4),
-                    Text('${post.commentCount}', style: const TextStyle(color: Colors.grey)),
+                    Text('${post.ratingCount}K',
+                        style:
+                            const TextStyle(color: Colors.grey, fontSize: 13)),
+                    const SizedBox(width: 16),
+                    const Icon(Icons.chat_bubble_outline,
+                        size: 18, color: Colors.grey),
+                    const SizedBox(width: 4),
+                    Text('${post.commentCount}',
+                        style:
+                            const TextStyle(color: Colors.grey, fontSize: 13)),
                   ],
                 ),
                 const Icon(Icons.bookmark_border, color: Colors.grey),
@@ -107,13 +162,36 @@ class PostCard extends StatelessWidget {
       ),
     );
   }
+
+  Widget _buildReactionAvatars(List<String> avatars) {
+    if (avatars.isEmpty) return const SizedBox();
+    return SizedBox(
+      width: 20.0 + (avatars.length - 1) * 12.0,
+      height: 24,
+      child: Stack(
+        children: List.generate(avatars.length, (index) {
+          return Positioned(
+            left: index * 12.0,
+            child: Container(
+              decoration: BoxDecoration(
+                  shape: BoxShape.circle,
+                  border: Border.all(color: AppColors.background, width: 2)),
+              child: CircleAvatar(
+                  radius: 10, backgroundImage: NetworkImage(avatars[index])),
+            ),
+          );
+        }),
+      ),
+    );
+  }
 }
 
 class GlassBottomNav extends StatelessWidget {
   final int currentIndex;
   final Function(int) onTap;
 
-  const GlassBottomNav({super.key, required this.currentIndex, required this.onTap});
+  const GlassBottomNav(
+      {super.key, required this.currentIndex, required this.onTap});
 
   @override
   Widget build(BuildContext context) {
@@ -121,7 +199,8 @@ class GlassBottomNav extends StatelessWidget {
       mainAxisSize: MainAxisSize.min,
       crossAxisAlignment: CrossAxisAlignment.end,
       children: [
-        _buildCircleButton(Icons.home, isActive: currentIndex == 0, onTap: () => onTap(0)),
+        _buildCircleButton(Icons.home,
+            isActive: currentIndex == 0, hasDot: true, onTap: () => onTap(0)),
         const SizedBox(width: 10),
         ClipRRect(
           borderRadius: BorderRadius.circular(32),
@@ -141,46 +220,67 @@ class GlassBottomNav extends StatelessWidget {
                   const SizedBox(width: 24),
                   InkWell(
                     onTap: () => onTap(1),
-                    child: Icon(
-                        Icons.local_activity_outlined, 
-                        color: currentIndex == 1 ? Colors.white : Colors.grey, 
-                        size: 26
-                    ),
+                    child: Icon(Icons.local_activity_outlined,
+                        color: currentIndex == 1 ? Colors.white : Colors.grey,
+                        size: 26),
                   ),
                   const SizedBox(width: 24),
-                  InkWell(
-                    onTap: () => onTap(2),
-                    child: Icon(Icons.chat_bubble_outline, color: currentIndex == 2 ? Colors.white : Colors.grey, size: 26),
-                  ),
+                  const Icon(Icons.chat_bubble_outline,
+                      color: Colors.grey, size: 26),
                   const SizedBox(width: 24),
-                  const Icon(Icons.person_outline, color: Colors.grey, size: 28),
+                  const Icon(Icons.person_outline,
+                      color: Colors.grey, size: 28),
                 ],
               ),
             ),
           ),
         ),
         const SizedBox(width: 10),
-        _buildCircleButton(Icons.stadium_outlined, isActive: currentIndex == 3, onTap: () => onTap(3)),
+        _buildCircleButton(Icons.stadium_outlined,
+            isActive: currentIndex == 3, onTap: () => onTap(3)),
       ],
     );
   }
 
-  Widget _buildCircleButton(IconData icon, {required bool isActive, required VoidCallback onTap}) {
+  Widget _buildCircleButton(IconData icon,
+      {required bool isActive,
+      bool hasDot = false,
+      required VoidCallback onTap}) {
     return GestureDetector(
       onTap: onTap,
-      child: Container(
-        width: 48,
-        height: 48,
-        margin: const EdgeInsets.only(bottom: 8),
-        decoration: BoxDecoration(
-          color: AppColors.background.withOpacity(0.9),
-          shape: BoxShape.circle,
-          border: Border.all(color: AppColors.glassBorder),
-          boxShadow: const [BoxShadow(color: Colors.black26, blurRadius: 10)],
-        ),
-        child: Center(
-            child: Icon(icon, color: isActive ? Colors.white : Colors.grey, size: 22),
-        ),
+      child: Stack(
+        children: [
+          Container(
+            width: 48,
+            height: 48,
+            margin: const EdgeInsets.only(bottom: 8),
+            decoration: BoxDecoration(
+              color: AppColors.background.withOpacity(0.9),
+              shape: BoxShape.circle,
+              border: Border.all(color: AppColors.glassBorder),
+              boxShadow: const [
+                BoxShadow(color: Colors.black26, blurRadius: 10)
+              ],
+            ),
+            child: Center(
+              child: Icon(icon,
+                  color: isActive ? Colors.white : Colors.grey, size: 22),
+            ),
+          ),
+          if (hasDot)
+            Positioned(
+              top: 4,
+              right: 4,
+              child: Container(
+                width: 8,
+                height: 8,
+                decoration: BoxDecoration(
+                    color: AppColors.neonPink,
+                    shape: BoxShape.circle,
+                    border: Border.all(color: AppColors.background, width: 2)),
+              ),
+            ),
+        ],
       ),
     );
   }
@@ -195,7 +295,7 @@ class LocationModal extends StatefulWidget {
 
 class _LocationModalState extends State<LocationModal> {
   double distance = 0;
-  
+
   @override
   Widget build(BuildContext context) {
     return Container(
@@ -207,14 +307,23 @@ class _LocationModalState extends State<LocationModal> {
       child: Column(
         children: [
           const SizedBox(height: 12),
-          Container(width: 40, height: 4, decoration: BoxDecoration(color: Colors.white24, borderRadius: BorderRadius.circular(2))),
+          Container(
+              width: 40,
+              height: 4,
+              decoration: BoxDecoration(
+                  color: Colors.white24,
+                  borderRadius: BorderRadius.circular(2))),
           Padding(
             padding: const EdgeInsets.all(20),
             child: Row(
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
-                const Text('Location', style: TextStyle(fontSize: 22, fontWeight: FontWeight.bold)),
-                IconButton(icon: const Icon(Icons.close), onPressed: () => Navigator.pop(context)),
+                const Text('Location',
+                    style:
+                        TextStyle(fontSize: 22, fontWeight: FontWeight.bold)),
+                IconButton(
+                    icon: const Icon(Icons.close),
+                    onPressed: () => Navigator.pop(context)),
               ],
             ),
           ),
@@ -226,7 +335,9 @@ class _LocationModalState extends State<LocationModal> {
                 hintText: 'Recherchez une ville...',
                 filled: true,
                 fillColor: const Color(0xFF2C2C2E),
-                border: OutlineInputBorder(borderRadius: BorderRadius.circular(12), borderSide: BorderSide.none),
+                border: OutlineInputBorder(
+                    borderRadius: BorderRadius.circular(12),
+                    borderSide: BorderSide.none),
               ),
             ),
           ),
@@ -239,11 +350,13 @@ class _LocationModalState extends State<LocationModal> {
                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   children: [
                     const Row(children: [
-                       Icon(Icons.location_on, size: 16),
-                       SizedBox(width: 8),
-                       Text('Montréal, QC', style: TextStyle(fontWeight: FontWeight.bold)),
+                      Icon(Icons.location_on, size: 16),
+                      SizedBox(width: 8),
+                      Text('Montréal, QC',
+                          style: TextStyle(fontWeight: FontWeight.bold)),
                     ]),
-                    Text(distance == 0 ? 'Exact' : '+ ${distance.toInt()} km', style: const TextStyle(color: Colors.blue)),
+                    Text(distance == 0 ? 'Exact' : '+ ${distance.toInt()} km',
+                        style: const TextStyle(color: Colors.blue)),
                   ],
                 ),
                 Slider(
@@ -259,22 +372,30 @@ class _LocationModalState extends State<LocationModal> {
           ),
           const SizedBox(height: 20),
           Expanded(
-             child: ListView(
-               padding: const EdgeInsets.symmetric(horizontal: 20),
-               children: [
-                 const Text('RÉCENT', style: TextStyle(color: Colors.grey, fontSize: 12, fontWeight: FontWeight.bold)),
-                 const SizedBox(height: 10),
-                 _buildListItem('Toronto, ON'),
-                 _buildListItem('Québec, QC'),
-                 const SizedBox(height: 20),
-                 const Text('QUARTIERS SUGGÉRÉS', style: TextStyle(color: Colors.grey, fontSize: 12, fontWeight: FontWeight.bold)),
-                 const SizedBox(height: 10),
-                 _buildListItem('Plateau-Mont-Royal'),
-                 _buildListItem('Ville-Marie'),
-                 _buildListItem('Rosemont'),
-                 _buildListItem('Verdun'),
-               ],
-             ),
+            child: ListView(
+              padding: const EdgeInsets.symmetric(horizontal: 20),
+              children: [
+                const Text('RÉCENT',
+                    style: TextStyle(
+                        color: Colors.grey,
+                        fontSize: 12,
+                        fontWeight: FontWeight.bold)),
+                const SizedBox(height: 10),
+                _buildListItem('Toronto, ON'),
+                _buildListItem('Québec, QC'),
+                const SizedBox(height: 20),
+                const Text('QUARTIERS SUGGÉRÉS',
+                    style: TextStyle(
+                        color: Colors.grey,
+                        fontSize: 12,
+                        fontWeight: FontWeight.bold)),
+                const SizedBox(height: 10),
+                _buildListItem('Plateau-Mont-Royal'),
+                _buildListItem('Ville-Marie'),
+                _buildListItem('Rosemont'),
+                _buildListItem('Verdun'),
+              ],
+            ),
           ),
         ],
       ),
@@ -285,9 +406,9 @@ class _LocationModalState extends State<LocationModal> {
     return Padding(
       padding: const EdgeInsets.symmetric(vertical: 12),
       child: Row(children: [
-         const Icon(Icons.history, color: Colors.grey, size: 20),
-         const SizedBox(width: 12),
-         Text(text, style: const TextStyle(fontSize: 14)),
+        const Icon(Icons.history, color: Colors.grey, size: 20),
+        const SizedBox(width: 12),
+        Text(text, style: const TextStyle(fontSize: 14)),
       ]),
     );
   }
